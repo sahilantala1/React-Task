@@ -6,7 +6,7 @@ const Data = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("default"); // Default sorting order
+  const [sortBy, setSortBy] = useState("default");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,39 +55,33 @@ const Data = () => {
         />
         <button onClick={() => handleSort("lowToHigh")}>Low to High</button>
         <button onClick={() => handleSort("highToLow")}>High to Low</button>
-        <div className={`row`}>
-          {filteredProducts.map((user) => (
-            <div
-              key={user.id}
-              className={`text-white col-4 position-relative ${styles.detailbox}`}
-            >
-              {user.images.length && (
-                <Link to={`/details/${user.id}`}>
+        <Link to={`/details/${user.id}`}>
+          <div className={`row`}>
+            {filteredProducts.map((user) => (
+              <div
+                key={user.id}
+                className={`text-white col-4 position-relative ${styles.detailbox}`}
+              >
+                {user.images.length && (
                   <img
                     className={`${styles.imagetag} m-3`}
                     src={user.images[0] ?? user.images[0]}
                     alt="Product"
                   />
-                </Link>
-              )}
-              <p>Name: {user.title}</p>
-              <p>Description: {user.description}</p>
-              <p>Price: {user.price}</p>
-              <p>Discount: {user.discountPercentage}</p>
-              <p>Rating: {user.rating}</p>
-              <p>Stock: {user.stock}</p>
-              <p>Brand: {user.brand}</p>
-              <p>Category: {user.category}</p>
-              <Link to={`/details/${user.id}`}>
+                )}
+                <p>Name: {user.title}</p>
+                <p>Description: {user.description}</p>
+                <p>Price: ₹{user.price}</p>
+
                 <button
                   className={`${styles.btnpos} btn btn-info position-absolute`}
                 >
                   Details
                 </button>
-              </Link>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        </Link>
       </div>
     </div>
   );

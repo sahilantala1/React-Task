@@ -34,7 +34,7 @@ const Details = () => {
     <>
       {selectedProduct && (
         <div>
-          {selectedProduct.images && selectedProduct.images.length > 1 ? (
+          {selectedProduct?.images && selectedProduct.images.length > 1 ? (
             <Slider {...sliderSettings}>
               {selectedProduct.images.map((image, index) => (
                 <div key={index}>
