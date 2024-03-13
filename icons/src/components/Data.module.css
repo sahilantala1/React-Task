@@ -10,15 +10,16 @@
 .imagetag{
     width: 200px;
     height: 200px;
-    border-radius: 50%;
+    border-radius: 50%; 
 }
 
 .detailbox{
-    border: 2px solid black;
-    gap: 5;
+    border: 2px solid rgb(254, 251, 251);
+    height: max-content;
+    width:450px;
+    margin: 5px 5px 5px 0;
+    background-color: black;
+    border-radius: 20px;
 }
 
-.btnpos{
-    bottom: 5px;
-    right: 5px;
-}
+
