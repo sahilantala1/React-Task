@@ -7,15 +7,17 @@ const Data = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("default");
-  const [loading, setLoading] = useState(false); // State to track loading for initial data
-  const [loadingMore, setLoadingMore] = useState(false); // State to track loading for next 30 data
+  const [maxPrice, setMaxPrice] = useState(Infinity);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const listInnerRef = useRef();
-  const pageRef = useRef(1); // Ref to track current page
+  const pageRef = useRef(1);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true); // Set loading to true when fetching initial data
+        setLoading(true);
         const response = await fetch("https://dummyjson.com/products");
         const data = await response.json();
         setAllProducts(data.products);
@@ -23,7 +25,7 @@ const Data = () => {
       } catch (error) {
         console.log(error);
       } finally {
-        setLoading(false); // Set loading to false when initial data fetching is completed
+        setLoading(false);
       }
     };
 
@@ -32,6 +34,14 @@ const Data = () => {
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
+  };
+
+  const handleMaxPriceChange = (e) => {
+    setMaxPrice(parseFloat(e.target.value));
+  };
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
   };
 
   useEffect(() => {
@@ -51,12 +61,18 @@ const Data = () => {
       );
     }
 
-    const filtered = sortedProducts.filter((product) =>
+    let filtered = sortedProducts.filter((product) =>
       product.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    filtered = filtered.filter(
+      (product) =>
+        product.price <= maxPrice &&
+        (selectedCategory === "All" || product.category === selectedCategory)
+    );
+
     setFilteredProducts(filtered);
-  }, [allProducts, searchTerm, sortOption]);
+  }, [allProducts, searchTerm, sortOption, maxPrice, selectedCategory]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -64,16 +80,10 @@ const Data = () => {
   });
 
   const handleScroll = () => {
-    console.log("call");
-    console.log(
-      Math.ceil(window.innerHeight + document.documentElement.scrollTop),
-      document.documentElement.offsetHeight
-    );
     if (
       Math.ceil(window.innerHeight + document.documentElement.scrollTop) ===
       document.documentElement.offsetHeight
     ) {
-      console.log("Fetch more list items!");
       fetchMoreItems();
     }
   };
@@ -89,11 +99,6 @@ const Data = () => {
       );
       const data = await response.json();
       setAllProducts((prevProducts) => [...prevProducts, ...data.products]);
-      setFilteredProducts((prevProducts) => [
-        ...prevProducts,
-        ...data.products,
-      ]);
-      pageRef.current = nextPage;
     } catch (error) {
       console.log(error);
     } finally {
@@ -111,14 +116,42 @@ const Data = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by title..."
           />
           <select value={sortOption} onChange={handleSortChange}>
             <option value="default">Select Sorting Option</option>
             <option value="lowToHigh">Price Low to High</option>
             <option value="highToLow">Price High to Low</option>
-            <option value="AtoZ"> Sorting A-Z</option>
-            <option value="ZtoA"> Sorting Z-A</option>
+            <option value="AtoZ">Sorting A-Z</option>
+            <option value="ZtoA">Sorting Z-A</option>
           </select>
+
+          <label>
+            Max Price:{" "}
+            <input
+              type="number"
+              value={maxPrice}
+              onChange={handleMaxPriceChange}
+              placeholder="Enter max price..."
+            />
+          </label>
+
+          <select value={selectedCategory} onChange={handleCategoryChange}>
+            <option value="All">All Categories</option>
+            <option value="smartphones">Smartphones</option>
+            <option value="laptops">Laptops</option>
+            <option value="fragrances">Fragrances</option>
+            <option value="skincare">Skincare</option>
+            <option value="groceries">Groceries</option>
+            <option value="home-decoration">Home-Decoration</option>
+            <option value="furniture">Furniture</option>
+            <option value="tops">Tops</option>
+            <option value="womens-dresses">womens-dresses</option>
+            <option value="mens-shirts">mens-shirts</option>
+            <option value="mens-shoes">mens-shoes</option>
+            {/* Add other categories as needed */}
+          </select>
+
           <div className={`row`} ref={listInnerRef}>
             {filteredProducts.map((product) => (
               <Link
@@ -138,11 +171,12 @@ const Data = () => {
                   )}
                   <h3>{product.title}</h3>
                   <h4>Price: ₹{product.price}</h4>
+                  <h5>Category : {product.category}</h5>
                 </div>
               </Link>
             ))}
           </div>
-          {loadingMore && <div>Loading more...</div>}{" "}
+          {loadingMore && <div>Loading more...</div>}
         </div>
       </div>
     </>
